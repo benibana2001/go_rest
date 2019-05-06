@@ -7,8 +7,6 @@ import (
 	"log"
 	"net/http"
 	"strings"
-
-	//"strings"
 )
 
 type User struct {
@@ -29,7 +27,7 @@ func main() {
 	// Read
 	var user User
 	var users []User
-	db.First(&user, "id = ?", "1") // find product with code l1212
+	//db.First(&user, "id = ?", "1") // find product with code l1212
 
 
 	// Handling
@@ -52,6 +50,7 @@ func main() {
 	// Listen
 	http.HandleFunc("/users", hUsers)
 	http.HandleFunc("/users/", hUser)
+	fmt.Printf("handler is %T", hUser)
 
 	log.Fatal(http.ListenAndServe(":8081", nil))
 }
