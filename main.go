@@ -11,8 +11,8 @@ import (
 
 type User struct {
 	//gorm.Model
-	Id int
-	Name string
+	Id    int `gorm:"primary_key"`
+	Name  string
 	Email string
 }
 
@@ -23,15 +23,7 @@ type Sample struct {
 	Column2 int
 }
 
-func main() {
-	db, err := connectDb()
-	defer db.Close()
-	if err != nil{
-		fmt.Printf("%v", err)
-		panic("failed to connect database")
-	}
-
-	// Create Table
+func createSampleTable(db *gorm.DB) {
 	db.CreateTable(&Sample{})
 
 	// Seeding - Create columns
@@ -41,17 +33,40 @@ func main() {
 	db.Create(&s2)
 	samples := selectAllSample(db)
 	fmt.Printf("%+v", samples)
+}
 
-	// Read
+func createUserTable(db *gorm.DB) {
+	db.CreateTable(&User{})
+	// Seeding -Create columns
+	u1 := User{Id: 0, Name: "Takeru Satou", Email: "takeru@mail.jp"}
+	u2 := User{Id: 0, Name: "Hanako Yamada", Email: "hanako@mail.jp"}
+	u3 := User{Id: 0, Name: "Satoshi Tajima", Email: "satoshi@mail.jp"}
+	db.Create(&u1)
+	db.Create(&u2)
+	db.Create(&u3)
+}
+
+func dropUserTable(db *gorm.DB) {
+	db.DropTable(&User{})
+}
+
+func main() {
+	db, err := connectDb()
+	defer db.Close()
+	if err != nil{
+		fmt.Printf("%v", err)
+		panic("failed to connect database")
+	}
+
 	var user User
 	var users []User
-	//db.First(&user, "id = ?", "1") // find product with code l1212
 
+	// Create Table
+	createUserTable(db)
 
 	// Handling
 	hUsers := func(w http.ResponseWriter, r *http.Request) {
 		users = selectAllUser(db)
-		fmt.Printf("Current URL is %v\n", r.URL)
 		fmt.Fprintf(w, "%+v", users)
 	}
 	hUser := func(w http.ResponseWriter, r *http.Request) {
