@@ -16,6 +16,13 @@ type User struct {
 	Email string
 }
 
+// Sample table to test migration
+type Sample struct {
+	Id int
+	Column1 string
+	Column2 int
+}
+
 func main() {
 	db, err := connectDb()
 	defer db.Close()
@@ -23,6 +30,17 @@ func main() {
 		fmt.Printf("%v", err)
 		panic("failed to connect database")
 	}
+
+	// Create Table
+	db.CreateTable(&Sample{})
+
+	// Seeding - Create columns
+	s1 := Sample{Id: 0, Column1: "Hello!", Column2: 100}
+	s2 := Sample{Id: 0, Column1: "Good Morning!", Column2: 50}
+	db.Create(&s1)
+	db.Create(&s2)
+	samples := selectAllSample(db)
+	fmt.Printf("%+v", samples)
 
 	// Read
 	var user User
@@ -49,8 +67,9 @@ func main() {
 
 	// Listen
 	http.HandleFunc("/users", hUsers)
+
+	// Request method is GET -> selectUser, PUT -> updateUser, Delete -> deleteUser
 	http.HandleFunc("/users/", hUser)
-	fmt.Printf("handler is %T", hUser)
 
 	log.Fatal(http.ListenAndServe(":8081", nil))
 }
@@ -81,3 +100,16 @@ func selectAllUser(db *gorm.DB) []User{
 	return users
 }
 
+// Select all sample
+func selectAllSample(db *gorm.DB) []Sample{
+	// Select
+	var samples []Sample
+	db.Find(&samples)
+	return samples
+}
+
+func createUser() {}
+
+func updateUser() {}
+
+func deleteUser() {}
