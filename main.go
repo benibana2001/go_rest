@@ -1,11 +1,15 @@
 package main
 
 import (
+	//"encoding/json"
 	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"log"
 	"net/http"
+	"strconv"
+
+	//"strconv"
 	"strings"
 )
 
@@ -62,28 +66,49 @@ func main() {
 	var users []User
 
 	// Create Table
-	createUserTable(db)
+	//createUserTable(db)
 
 	// Handling
 	hUsers := func(w http.ResponseWriter, r *http.Request) {
-		users = selectAllUser(db)
-		fmt.Fprintf(w, "%+v", users)
+		m := r.Method
+		if m == "GET" {
+			users = selectAllUser(db)
+			fmt.Fprintf(w, "%+v", users)
+		} else if m == "POST" {
+			// Parse JSON
+			i, _ := strconv.Atoi(r.FormValue("Id"))
+			n := r.FormValue("Name")
+			e := r.FormValue("Email")
+
+			newUser := User{
+				Id   : i,
+				Name : n,
+				Email: e,
+			}
+			fmt.Printf("newUser is %v\n", newUser)
+			db.Create(&newUser)
+		}
 	}
 	hUser := func(w http.ResponseWriter, r *http.Request) {
 		s := strings.Split(r.URL.Path, "/")// ["" "users" "1"]
-		user = selectUser(db, s[2])
 
 		// Todo: request_id > len(data)
 
-		fmt.Printf("Current Path is %q Type is %T\n", s, s)
-		fmt.Printf("userId is %v", s[2])
-		fmt.Fprintf(w, "%+v", user)
+		// Request method is GET -> selectUser, PUT -> updateUser, Delete -> deleteUser
+
+		m := r.Method
+		if m == "GET" {
+			// Select user
+			user = selectUser(db, s[2])
+			fmt.Fprintf(w, "%+v", user)
+		} else if m == "POST" {
+
+		}
 	}
 
 	// Listen
 	http.HandleFunc("/users", hUsers)
 
-	// Request method is GET -> selectUser, PUT -> updateUser, Delete -> deleteUser
 	http.HandleFunc("/users/", hUser)
 
 	log.Fatal(http.ListenAndServe(":8081", nil))
