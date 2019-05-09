@@ -54,6 +54,21 @@ func dropUserTable(db *gorm.DB) {
 	db.DropTable(&User{})
 }
 
+// Parse Json
+
+func parseJson(r *http.Request) User{
+
+	i, _ := strconv.Atoi(r.FormValue("Id"))
+	n := r.FormValue("Name")
+	e := r.FormValue("Email")
+	newUser := User{
+		Id:    i,
+		Name:  n,
+		Email: e,
+	}
+	return newUser
+}
+
 func main() {
 	db, err := connectDb()
 	defer db.Close()
@@ -65,9 +80,6 @@ func main() {
 	var user User
 	var users []User
 
-	// Create Table
-	//createUserTable(db)
-
 	// Handling
 	hUsers := func(w http.ResponseWriter, r *http.Request) {
 		m := r.Method
@@ -75,16 +87,7 @@ func main() {
 			users = selectAllUser(db)
 			fmt.Fprintf(w, "%+v", users)
 		} else if m == "POST" {
-			// Parse JSON
-			i, _ := strconv.Atoi(r.FormValue("Id"))
-			n := r.FormValue("Name")
-			e := r.FormValue("Email")
-
-			newUser := User{
-				Id   : i,
-				Name : n,
-				Email: e,
-			}
+			newUser := parseJson(r)
 			fmt.Printf("newUser is %v\n", newUser)
 			db.Create(&newUser)
 		}
@@ -102,7 +105,8 @@ func main() {
 			user = selectUser(db, s[2])
 			fmt.Fprintf(w, "%+v", user)
 		} else if m == "POST" {
-
+			// Update user
+			user = selectUser(db, s[2])
 		}
 	}
 
