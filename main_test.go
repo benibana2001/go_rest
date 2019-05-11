@@ -1,16 +1,13 @@
 package main
 
 import (
-	"fmt"
+	"github.com/benibana2001/go_rest/data"
 	"testing"
 )
 
 func TestSelectUser(t *testing.T) {
-	db, err := connectDb()
+	db := data.ConnectDb()
 	defer db.Close()
-	if err != nil{
-		fmt.Printf("%v", err)
-	}
 
 	user := selectUser(db, "1")
 	if user.Id != 1 {
@@ -25,11 +22,8 @@ func TestSelectUser(t *testing.T) {
 }
 
 func TestSelectAllUser(t *testing.T) {
-	db, err := connectDb()
+	db := data.ConnectDb()
 	defer db.Close()
-	if err != nil{
-		fmt.Printf("%v", err)
-	}
 
 	users := selectAllUser(db)
 	if users[0].Id != 1 {
