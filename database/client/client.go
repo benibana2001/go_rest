@@ -39,10 +39,10 @@ func (c Client) get () {
 	fmt.Println(resp)
 }
 
-func (c Client) post (json []byte) {
-	fmt.Println("[]byte is -> ", json)
-	_, err := http.Post(c.url, c.contentType, bytes.NewBuffer(json))
-	fmt.Printf("[]byte is -> %v", bytes.NewBuffer(json))
+func (c Client) post (bs []byte) {
+	fmt.Println("[]byte is -> ", bs)
+	_, err := http.Post(c.url, c.contentType, bytes.NewBuffer(bs))
+	fmt.Printf("body (io.Reader) is -> %v \n", bytes.NewBuffer(bs))
 
 	if err != nil {
 		fmt.Println("Error: ", err)
