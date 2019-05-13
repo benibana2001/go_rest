@@ -1,31 +1,17 @@
 package main
 
 import (
-	//"encoding/json"
+	"encoding/json"
 	"fmt"
 	"github.com/benibana2001/go_rest/data"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"io/ioutil"
 	"log"
 	"net/http"
-	"strconv"
+	"os"
 	"strings"
 )
-
-// Parse Json
-
-func parseJson(r *http.Request) data.User{
-
-	i, _ := strconv.Atoi(r.FormValue("Id"))
-	n := r.FormValue("Name")
-	e := r.FormValue("Email")
-	newUser := data.User{
-		Id:    i,
-		Name:  n,
-		Email: e,
-	}
-	return newUser
-}
 
 func main() {
 	db := data.ConnectDb()
@@ -38,13 +24,12 @@ func main() {
 			users := selectAllUser(db)
 			fmt.Fprintf(w, "%+v", users)
 		} else if m == "POST" {
-			newUser := parseJson(r)
-			fmt.Printf("newUser is %v\n", newUser)
-			db.Create(&newUser)
+			defer r.Body.Close()
+			createUser(db, r)
 		}
 	}
 	hUser := func(w http.ResponseWriter, r *http.Request) {
-		s := strings.Split(r.URL.Path, "/")// ["" "users" "1"]
+		s := strings.Split(r.URL.Path, "/") // ["" "users" "1"]
 
 		// Todo: request_id > len(data)
 
@@ -69,8 +54,35 @@ func main() {
 	log.Fatal(http.ListenAndServe(":8081", nil))
 }
 
+// Parse Json
+func parseJson(r *http.Request) data.User {
+	// Parse
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		fmt.Println("Error :", err)
+		os.Exit(5)
+	}
+
+	// Unmarshal
+	user := data.User{}
+	err = json.Unmarshal(body, &user)
+	fmt.Println(&user)
+	if err != nil {
+		fmt.Println("Error : ", err)
+		os.Exit(4)
+	}
+	return user
+}
+
+// Create user
+func createUser(db *gorm.DB, r *http.Request) {
+	user := parseJson(r)
+	db.Create(&user)
+	fmt.Printf("newUser is %v\n", user)
+}
+
 // Select user
-func selectUser(db *gorm.DB, id string) data.User{
+func selectUser(db *gorm.DB, id string) data.User {
 	var user data.User
 	db.First(&user, "id = ?", id)
 
@@ -79,7 +91,7 @@ func selectUser(db *gorm.DB, id string) data.User{
 }
 
 // Select all user
-func selectAllUser(db *gorm.DB) []data.User{
+func selectAllUser(db *gorm.DB) []data.User {
 	// Select
 	var users []data.User
 	db.Find(&users)

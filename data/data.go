@@ -8,11 +8,10 @@ import (
 
 type User struct {
 	//gorm.Model
-	Id    int `gorm:"primary_key"`
-	Name  string
-	Email string
+	Id    int    `json:"Id"`
+	Name  string `json:"Name"`
+	Email string `json:"Email"`
 }
-
 
 // Connect Database
 func ConnectDb() (*gorm.DB){

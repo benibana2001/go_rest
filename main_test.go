@@ -1,7 +1,11 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/benibana2001/go_rest/data"
+	"io"
+	"net/http"
 	"testing"
 )
 
@@ -32,4 +36,30 @@ func TestSelectAllUser(t *testing.T) {
 	if users[2].Id != 3 {
 		t.Errorf("Expected users[2].Id is 3, but got %v", users[2].Id)
 	}
+}
+
+func TestParesJson() {
+	user := &data.User{
+		Id: 0,
+		Name: "Jeff Bezos",
+		Email: "bezos@mail.com",
+	}
+	json, _ := json.Marshal(&user)
+	bs := []byte(json)
+	postClient, _ := http.Post(
+		"http://localhost:8081/users",
+		"application/json",
+		logReader{},
+		)
+	postClient.post
+
+	parseJson
+
+}
+
+type logReader struct {}
+
+func (lr logReader) Read(p []byte) (n int, err error) {
+	fmt.Println(n)
+	return n, err
 }
