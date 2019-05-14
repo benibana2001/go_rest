@@ -22,7 +22,7 @@ func main() {
 	defer db.Close()
 
 	c := Client{
-		url: "http://localhost:8081/users",
+		url: "http://localhost:8081/users/",
 		contentType: "application/json",
 	}
 	user := data.User{Id: 0, Name: "Jeff Bezos", Email: "bezos@mail.com"}

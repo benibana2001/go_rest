@@ -4,41 +4,37 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/benibana2001/go_rest/data"
+	"github.com/gorilla/mux"
 	"io/ioutil"
 	"net/http"
 	"os"
-	"strings"
 )
 
 type Controller struct{}
 
-// Handler functions
-func (c Controller) HUsers (w http.ResponseWriter, r *http.Request) {
-	m := r.Method
-	if m == "GET" {
-		users := selectAllUser()
-		fmt.Fprintf(w, "%+v", users)
-	} else if m == "POST" {
-		defer r.Body.Close()
-		createUser(r)
-	}
+// users
+func (c Controller) GetUsers (w http.ResponseWriter, r *http.Request) {
+	users := selectAllUser()
+	fmt.Fprintf(w, "%+v", users)
 }
-func (c Controller) HUser (w http.ResponseWriter, r *http.Request) {
-	s := strings.Split(r.URL.Path, "/") // ["" "users" "1"]
 
-	// Todo: request_id > len(data)
+// create user
+func (c Controller) CreateUser (w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	createUser(r)
+}
 
-	// Request method is GET -> selectUser, PUT -> updateUser, Delete -> deleteUser
+// user
+func (c Controller) GetUser (w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	id := params["id"]
+	user := selectUser(id)
+	fmt.Fprintf(w, "%+v", user)
+}
 
-	m := r.Method
-	if m == "GET" {
-		// Select user
-		user := selectUser(s[2])
-		fmt.Fprintf(w, "%+v", user)
-	} else if m == "POST" {
-		// Todo: Implement Update user
-		//user := selectUser(db, s[2])
-	}
+// update user
+func (c Controller) UpdateUser (w http.ResponseWriter, r *http.Request) {
+	// not implemented yet
 }
 
 // Create user
