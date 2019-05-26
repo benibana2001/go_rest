@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"github.com/benibana2001/go_rest/data"
 	"github.com/jinzhu/gorm"
@@ -25,9 +24,10 @@ func main() {
 		url: "http://localhost:8081/users/",
 		contentType: "application/json",
 	}
-	user := data.User{Id: 0, Name: "Jeff Bezos", Email: "bezos@mail.com"}
-	buf, _ := json.Marshal(&user)
-	c.post(buf)
+	//user := data.User{Id: 0, Name: "Jeff Bezos", Email: "bezos@mail.com"}
+	//buf, _ := json.Marshal(&user)
+	//c.post(buf)
+	c.get()
 }
 
 func (c Client) get () {
@@ -48,5 +48,14 @@ func (c Client) post (bs []byte) {
 		fmt.Println("Error: ", err)
 		os.Exit(3)
 	}
+
+}
+
+func (c Client) delete () {
+	//resp, err := http.Get(c.url)
+	//if err != nil {
+	//	fmt.Printf("Error : %v", err)
+	//	os.Exit(2)
+	//}
 
 }
